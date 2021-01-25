@@ -49,14 +49,34 @@ public class CameraPointer : MonoBehaviour
         else
         {
             // No GameObject detected in front of the camera.
-            _gazedAtObject?.SendMessage("OnPointerExit");
+            // AltReality: Set SendMessageOptions to be DontRequireReceiver, to get rid of error
+            _gazedAtObject?.SendMessage("OnPointerExit", SendMessageOptions.DontRequireReceiver);
             _gazedAtObject = null;
         }
 
         // Checks for screen touches.
-        if (Google.XR.Cardboard.Api.IsTriggerPressed)
+        //if (Google.XR.Cardboard.Api.IsTriggerPressed)
+        //{
+        //    _gazedAtObject?.SendMessage("OnPointerClick");
+        //}
+
+        // AltReality: use Input.GetTouch() so can detect touch
+        // when both VR mode or non VR mode
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            if (touch.phase == TouchPhase.Began)
+            {
+                _gazedAtObject?.SendMessage("OnPointerClick");
+            }
+        }
+
+        // AltReality: add mouse click support
+#if UNITY_EDITOR
+        if (Input.GetMouseButtonDown(0))
         {
             _gazedAtObject?.SendMessage("OnPointerClick");
         }
+#endif
     }
 }

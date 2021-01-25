@@ -27,6 +27,12 @@ using UnityEngine.XR.Management;
 /// </summary>
 public class VrModeController : MonoBehaviour
 {
+    // AltRealities Update
+    // For updating Camera's FoV & Aspect Ratio after build
+    public Camera MainCamera;
+    // For toggling NonVR GameObjects
+    public GameObject[] nonVrObjects;
+
     /// <summary>
     /// Gets a value indicating whether the screen has been touched this frame.
     /// </summary>
@@ -46,6 +52,15 @@ public class VrModeController : MonoBehaviour
         get
         {
             return XRGeneralSettings.Instance.Manager.isInitializationComplete;
+        }
+    }
+
+    private void Awake()
+    {
+        // Hide NonVR objects
+        foreach (GameObject _object in nonVrObjects)
+        {
+            _object.SetActive(false);
         }
     }
 
@@ -75,6 +90,7 @@ public class VrModeController : MonoBehaviour
     /// </summary>
     public void Update()
     {
+#if !UNITY_EDITOR
         if (_isVrModeEnabled)
         {
             if (Api.IsCloseButtonPressed)
@@ -89,21 +105,30 @@ public class VrModeController : MonoBehaviour
 
             Api.UpdateScreenParams();
         }
-        else
-        {
-            // TODO(b/171727815): Add a button to switch to VR mode.
-            if (_isScreenTouched)
-            {
-                EnterVR();
-            }
-        }
+        // else
+        // {
+        //     // TODO(b/171727815): Add a button to switch to VR mode.
+        //     if (_isScreenTouched)
+        //     {
+        //         EnterVR();
+        //     }
+        // }
+#endif
     }
 
     /// <summary>
     /// Enters VR mode.
     /// </summary>
-    private void EnterVR()
+    public void EnterVR()
     {
+        Debug.Log("click");
+
+        // Hide NonVR objects
+        foreach (GameObject _object in nonVrObjects)
+        {
+            _object.SetActive(false);
+        }
+
         StartCoroutine(StartXR());
         if (Api.HasNewDeviceParams())
         {
@@ -117,6 +142,12 @@ public class VrModeController : MonoBehaviour
     private void ExitVR()
     {
         StopXR();
+
+        // Show NonVR objects
+        foreach (GameObject _object in nonVrObjects)
+        {
+            _object.SetActive(true);
+        }
     }
 
     /// <summary>
@@ -159,5 +190,12 @@ public class VrModeController : MonoBehaviour
         Debug.Log("Deinitializing XR...");
         XRGeneralSettings.Instance.Manager.DeinitializeLoader();
         Debug.Log("XR deinitialized.");
+
+        // AltRealities: Reset FoV & Aspect Ratio
+        MainCamera.fieldOfView = 60.0f;
+        MainCamera.ResetAspect();
+        MainCamera.ResetProjectionMatrix();
+        MainCamera.ResetWorldToCameraMatrix();
+        Debug.Log("Camera is now set on default parameters");
     }
 }

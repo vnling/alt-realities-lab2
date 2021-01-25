@@ -4,5 +4,10 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
-  m_configObjects: {}
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Samples/Google Cardboard XR Plugin for Unity/1.4.1/Hello Cardboard/Scenes/VrMode.unity
+    guid: 4812ec05e87b8414abcdfe0d625c0e60
+  m_configObjects:
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: eb1cf35168b6e074f8fa6d9406b80971,
+      type: 2}
